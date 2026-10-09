@@ -1,5 +1,7 @@
 # repo-fortune
 
+[![ci](https://github.com/PKusch/repo-fortune/actions/workflows/ci.yml/badge.svg)](https://github.com/PKusch/repo-fortune/actions/workflows/ci.yml)
+
 A horoscope for your git repo. Run it in any repo and it reads the commit history and tells you what kind of repo it is.
 
 ```
