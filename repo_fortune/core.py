@@ -35,7 +35,7 @@ def read_commits(path="."):
         if len(parts) != 3:
             continue
         name, iso, subject = parts
-        commits.append(Commit(name, datetime.fromisoformat(iso), subject))
+        commits.append(Commit(name, datetime.fromisoformat(iso.replace("Z", "+00:00")), subject))
     commits.reverse()
     return commits
 

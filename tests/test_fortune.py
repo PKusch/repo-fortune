@@ -12,7 +12,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def c(when, subject="add thing", author="a"):
-    return Commit(author, datetime.fromisoformat(when), subject)
+    return Commit(author, datetime.fromisoformat(when.replace("Z", "+00:00")), subject)
 
 
 class Rules(unittest.TestCase):
