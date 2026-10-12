@@ -1,0 +1,16 @@
+name: Fortune feels wrong
+description: The fortune does not fit your repo
+body:
+  - type: input
+    id: fortune
+    attributes:
+      label: Which fortune did you get?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why does it not fit?
+      description: What is the repo like, and which fortune would you expect?
+    validations:
+      required: true
