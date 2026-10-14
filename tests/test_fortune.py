@@ -54,10 +54,15 @@ class Rules(unittest.TestCase):
         cs = [c(f"2026-01-{d:02d}T10:00:00") for d in range(5, 20)]  # 15 days in a row
         self.assertEqual(fortune(cs)["name"], "The Streaker")
 
-    def test_dates_ending_in_z_parse(self):
-        # Python 3.9 rejects a trailing Z, which once broke CI there
-        self.assertEqual(c("2026-01-03T02:00:00Z").when.hour, 2)
-        self.assertEqual(c("2026-01-03T02:00:00Z").when.utcoffset().total_seconds(), 0)
+    def test_a_commit_made_in_utc_is_read(self):
+        # git can print a UTC time with a trailing Z, which Python 3.9 rejects
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            env = dict(os.environ, GIT_AUTHOR_DATE="2026-01-03T02:00:00+0000",
+                       GIT_COMMITTER_DATE="2026-01-03T02:00:00+0000", TZ="UTC")
+            subprocess.run(["git", "-C", d, "-c", "user.name=a", "-c", "user.email=a@a",
+                            "commit", "-q", "--allow-empty", "-m", "x"], check=True, env=env)
+            self.assertEqual(read_commits(d)[0].when.hour, 2)
 
     def test_default_is_steady(self):
         cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]
