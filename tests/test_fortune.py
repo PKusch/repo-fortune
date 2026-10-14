@@ -76,6 +76,15 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertIn("NIGHT OWL", r.stdout)
 
+    def test_repo_with_no_commits_is_the_blank_page(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            self.assertEqual(read_commits(d), [])
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d], cwd=ROOT,
+                               capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("BLANK PAGE", r.stdout)
+
     def test_not_a_repo(self):
         with tempfile.TemporaryDirectory() as d:
             r = subprocess.run([sys.executable, "-m", "repo_fortune", d], cwd=ROOT,

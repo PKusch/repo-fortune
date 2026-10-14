@@ -20,14 +20,20 @@ class Commit:
 
 
 def read_commits(path="."):
-    """Return commits oldest-first. Raises RuntimeError if not a git repo."""
+    """Return commits oldest-first (empty for a repo with no commits yet).
+
+    Raises RuntimeError if the path is not a git repo."""
     fmt = SEP.join(["%an", "%aI", "%s"])
     try:
         out = subprocess.run(
             ["git", "-C", path, "log", "--no-merges", f"--format={fmt}"],
             capture_output=True, text=True, check=True,
         ).stdout
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+    except FileNotFoundError as e:
+        raise RuntimeError(f"could not read git history in {path!r}") from e
+    except subprocess.CalledProcessError as e:
+        if "does not have any commits" in (e.stderr or ""):
+            return []  # a real repo with no commits yet: the Blank Page
         raise RuntimeError(f"could not read git history in {path!r}") from e
     commits = []
     for line in out.splitlines():
