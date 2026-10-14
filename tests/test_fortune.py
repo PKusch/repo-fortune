@@ -37,6 +37,23 @@ class Rules(unittest.TestCase):
         cs = [c("2026-01-05T10:00:00", "wip")] * 2 + [c("2026-01-06T10:00:00")] * 8
         self.assertEqual(fortune(cs)["name"], "The Mysterious One")
 
+    def test_early_bird(self):
+        cs = [c(f"2026-01-{d:02d}T06:00:00") for d in range(5, 9)]
+        self.assertEqual(fortune(cs)["name"], "The Early Bird")
+
+    def test_confetti_cannon(self):
+        cs = [c("2026-01-05T10:00:00", "ship it \U0001F389")] * 3 + [c("2026-01-06T10:00:00")]
+        self.assertEqual(fortune(cs)["name"], "The Confetti Cannon")
+
+    def test_novelist(self):
+        long = "rework the importer so that it reads each file once and reports every problem together"
+        cs = [c("2026-01-05T10:00:00", long), c("2026-01-06T11:00:00", long)]
+        self.assertEqual(fortune(cs)["name"], "The Novelist")
+
+    def test_streaker(self):
+        cs = [c(f"2026-01-{d:02d}T10:00:00") for d in range(5, 20)]  # 15 days in a row
+        self.assertEqual(fortune(cs)["name"], "The Streaker")
+
     def test_default_is_steady(self):
         cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]
         self.assertEqual(fortune(cs)["name"], "The Steady Hand")
