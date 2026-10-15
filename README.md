@@ -34,6 +34,8 @@ cd repo-fortune
 python3 -m repo_fortune /path/to/any/repo
 ```
 
+Add `--json` to get the fortune and its numbers as data instead of the box.
+
 ## What it does and why
 
 It counts a few plain things in your history (when you commit, how long your messages are, how often they say "fix") and picks the fortune that fits best. Nine fortunes: Night Owl, Weekend Warrior, Firefighter, Mysterious One, Confetti Cannon, Early Bird, Novelist, Streaker, and Steady Hand. A repo with no commits yet gets a tenth, the Blank Page.

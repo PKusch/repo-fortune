@@ -112,6 +112,22 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertIn("BLANK PAGE", r.stdout)
 
+    def test_json_output_is_valid_and_has_the_fortune(self):
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            env = dict(os.environ, GIT_AUTHOR_DATE="2026-01-03T02:00:00+0000",
+                       GIT_COMMITTER_DATE="2026-01-03T02:00:00+0000")
+            subprocess.run(["git", "-C", d, "-c", "user.name=a", "-c", "user.email=a@a",
+                            "commit", "-q", "--allow-empty", "-m", "x"], check=True, env=env)
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d, "--json"], cwd=ROOT,
+                               capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            out = json.loads(r.stdout)
+            self.assertIn("fortune", out)
+            self.assertEqual(out["stats"]["n"], 1)
+            self.assertEqual(out["stats"]["busiest_day"]["commits"], 1)
+
     def test_not_a_repo(self):
         with tempfile.TemporaryDirectory() as d:
             r = subprocess.run([sys.executable, "-m", "repo_fortune", d], cwd=ROOT,
