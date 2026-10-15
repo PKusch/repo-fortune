@@ -19,14 +19,15 @@ class Commit:
     subject: str
 
 
-def read_commits(path="."):
+def read_commits(path=".", author=None):
     """Return commits oldest-first (empty for a repo with no commits yet).
 
     Raises RuntimeError if the path is not a git repo."""
     fmt = SEP.join(["%an", "%aI", "%s"])
     try:
         out = subprocess.run(
-            ["git", "-C", path, "log", "--no-merges", f"--format={fmt}"],
+            ["git", "-C", path, "log", "--no-merges", f"--format={fmt}"]
+            + ([f"--author={author}"] if author else []),
             capture_output=True, text=True, check=True,
         ).stdout
     except FileNotFoundError as e:

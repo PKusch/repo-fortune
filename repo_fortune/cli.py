@@ -11,11 +11,12 @@ def main(argv=None):
                                 description="Read your git history's fortune.")
     p.add_argument("path", nargs="?", default=".", help="repo to read (default: here)")
     p.add_argument("--version", action="version", version=__version__)
+    p.add_argument("--author", help="only read commits whose author matches this name or email")
     p.add_argument("--json", action="store_true",
                    help="print the fortune and its numbers as JSON")
     args = p.parse_args(argv)
     try:
-        commits = read_commits(args.path)
+        commits = read_commits(args.path, author=args.author)
     except RuntimeError as e:
         print(f"repo-fortune: {e}", file=sys.stderr)
         return 1

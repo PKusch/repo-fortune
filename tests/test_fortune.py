@@ -128,6 +128,17 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(out["stats"]["n"], 1)
             self.assertEqual(out["stats"]["busiest_day"]["commits"], 1)
 
+    def test_author_filter_reads_only_that_authors_commits(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            for who in ("ann", "ann", "bob"):
+                subprocess.run(["git", "-C", d, "-c", f"user.name={who}", "-c", f"user.email={who}@x",
+                                "commit", "-q", "--allow-empty", "-m", "x"], check=True)
+            self.assertEqual(len(read_commits(d)), 3)
+            self.assertEqual(len(read_commits(d, author="ann")), 2)
+            self.assertEqual(len(read_commits(d, author="bob")), 1)
+            self.assertEqual(read_commits(d, author="nobody"), [])
+
     def test_not_a_repo(self):
         with tempfile.TemporaryDirectory() as d:
             r = subprocess.run([sys.executable, "-m", "repo_fortune", d], cwd=ROOT,

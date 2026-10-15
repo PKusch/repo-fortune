@@ -34,7 +34,7 @@ cd repo-fortune
 python3 -m repo_fortune /path/to/any/repo
 ```
 
-Add `--json` to get the fortune and its numbers as data instead of the box.
+Add `--json` to get the fortune and its numbers as data instead of the box, or `--author "Ann"` to read only one person's commits.
 
 ## What it does and why
 
