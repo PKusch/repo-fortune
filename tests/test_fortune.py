@@ -74,6 +74,19 @@ class Rules(unittest.TestCase):
             self.assertEqual(len(read_commits(d)), 2)
             self.assertEqual([x.subject for x in read_commits(d, since="2025-01-01")], ["new"])
 
+    def test_lone_wolf(self):
+        cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00") for i in range(20)]  # 20 commits, one author
+        self.assertEqual(fortune(cs)["name"], "The Lone Wolf")
+
+    def test_a_short_solo_history_is_not_a_lone_wolf(self):
+        cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]
+        self.assertEqual(fortune(cs)["name"], "The Steady Hand")
+
+    def test_choir(self):
+        names = ["a", "b", "c", "d", "e"]
+        cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author=names[i % 5]) for i in range(10)]
+        self.assertEqual(fortune(cs)["name"], "The Choir")
+
     def test_default_is_steady(self):
         cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]
         self.assertEqual(fortune(cs)["name"], "The Steady Hand")
