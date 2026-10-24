@@ -6,7 +6,7 @@ import unittest
 from datetime import date, datetime
 
 from repo_fortune.core import (Commit, fortune, longest_streak, lucky_number,
-                               read_commits, render, stats)
+                               read_commits, render, render_markdown, stats)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -86,6 +86,18 @@ class Rules(unittest.TestCase):
         names = ["a", "b", "c", "d", "e"]
         cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author=names[i % 5]) for i in range(10)]
         self.assertEqual(fortune(cs)["name"], "The Choir")
+
+    def test_markdown_has_the_name_the_reading_and_a_table(self):
+        cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]
+        md = render_markdown(cs)
+        self.assertTrue(md.startswith("### The Steady Hand"))
+        self.assertIn("| commits | 2 |", md)
+        self.assertEqual(md, render_markdown(cs))
+
+    def test_markdown_for_an_empty_repo_is_just_the_page(self):
+        md = render_markdown([])
+        self.assertIn("The Blank Page", md)
+        self.assertNotIn("|", md)
 
     def test_default_is_steady(self):
         cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]

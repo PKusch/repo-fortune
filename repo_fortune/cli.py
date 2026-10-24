@@ -3,7 +3,7 @@ import json
 import sys
 
 from . import __version__
-from .core import fortune, read_commits, render
+from .core import fortune, read_commits, render, render_markdown
 
 
 def main(argv=None):
@@ -13,6 +13,8 @@ def main(argv=None):
     p.add_argument("--version", action="version", version=__version__)
     p.add_argument("--author", help="only read commits whose author matches this name or email")
     p.add_argument("--since", help="only read commits after this date, e.g. 2026-01-01 or '3 months ago'")
+    p.add_argument("--markdown", action="store_true",
+                   help="print the fortune as a Markdown block to paste into a README or issue")
     p.add_argument("--json", action="store_true",
                    help="print the fortune and its numbers as JSON")
     args = p.parse_args(argv)
@@ -30,5 +32,5 @@ def main(argv=None):
             stats["busiest_day"] = {"date": day.isoformat(), "commits": count}
         print(json.dumps({"fortune": f["name"], "reading": f["reading"], "stats": stats}, indent=2))
         return 0
-    print(render(commits))
+    print(render_markdown(commits) if args.markdown else render(commits))
     return 0

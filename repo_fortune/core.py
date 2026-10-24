@@ -197,3 +197,25 @@ def wrap(text, width):
     if cur:
         out.append(cur)
     return out
+
+
+def render_markdown(commits):
+    """The same fortune as a small block you can paste into a README or an issue."""
+    f = fortune(commits)
+    s = f["stats"]
+    out = [f"### {f['name']}", "", f"_{f['reading']}_"]
+    if s["n"]:
+        out += [
+            "",
+            "| | |", "|:--|:--|",
+            f"| commits | {s['n']} |",
+            f"| lived between | {s['first']} and {s['last']} |",
+            f"| favourite hour | {_hour(s['peak_hour'])} |",
+            f"| favourite day | {DAYS[s['busiest_weekday']]} |",
+            f"| night commits | {_pct(s['night'])} |",
+            f"| weekend commits | {_pct(s['weekend'])} |",
+            f"| 'fix' commits | {_pct(s['fix'])} |",
+            f"| longest streak | {s['streak']} day{'s' * (s['streak'] != 1)} |",
+            f"| lucky number | {lucky_number(commits)} |",
+        ]
+    return "\n".join(out)
