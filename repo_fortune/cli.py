@@ -12,11 +12,12 @@ def main(argv=None):
     p.add_argument("path", nargs="?", default=".", help="repo to read (default: here)")
     p.add_argument("--version", action="version", version=__version__)
     p.add_argument("--author", help="only read commits whose author matches this name or email")
+    p.add_argument("--since", help="only read commits after this date, e.g. 2026-01-01 or '3 months ago'")
     p.add_argument("--json", action="store_true",
                    help="print the fortune and its numbers as JSON")
     args = p.parse_args(argv)
     try:
-        commits = read_commits(args.path, author=args.author)
+        commits = read_commits(args.path, author=args.author, since=args.since)
     except RuntimeError as e:
         print(f"repo-fortune: {e}", file=sys.stderr)
         return 1

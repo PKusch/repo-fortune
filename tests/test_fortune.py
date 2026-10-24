@@ -64,6 +64,16 @@ class Rules(unittest.TestCase):
                             "commit", "-q", "--allow-empty", "-m", "x"], check=True, env=env)
             self.assertEqual(read_commits(d)[0].when.hour, 2)
 
+    def test_since_keeps_only_newer_commits(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            for when, msg in (("2020-01-03T10:00:00+0000", "old"), ("2026-01-03T10:00:00+0000", "new")):
+                env = dict(os.environ, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when, TZ="UTC")
+                subprocess.run(["git", "-C", d, "-c", "user.name=a", "-c", "user.email=a@a",
+                                "commit", "-q", "--allow-empty", "-m", msg], check=True, env=env)
+            self.assertEqual(len(read_commits(d)), 2)
+            self.assertEqual([x.subject for x in read_commits(d, since="2025-01-01")], ["new"])
+
     def test_default_is_steady(self):
         cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]
         self.assertEqual(fortune(cs)["name"], "The Steady Hand")

@@ -19,7 +19,7 @@ class Commit:
     subject: str
 
 
-def read_commits(path=".", author=None):
+def read_commits(path=".", author=None, since=None):
     """Return commits oldest-first (empty for a repo with no commits yet).
 
     Raises RuntimeError if the path is not a git repo."""
@@ -27,7 +27,8 @@ def read_commits(path=".", author=None):
     try:
         out = subprocess.run(
             ["git", "-C", path, "log", "--no-merges", f"--format={fmt}"]
-            + ([f"--author={author}"] if author else []),
+            + ([f"--author={author}"] if author else [])
+            + ([f"--since={since}"] if since else []),
             capture_output=True, text=True, check=True,
         ).stdout
     except FileNotFoundError as e:
