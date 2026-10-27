@@ -74,6 +74,16 @@ class Rules(unittest.TestCase):
             self.assertEqual(len(read_commits(d)), 2)
             self.assertEqual([x.subject for x in read_commits(d, since="2025-01-01")], ["new"])
 
+    def test_until_keeps_only_older_commits(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            for when, msg in (("2020-01-03T10:00:00+0000", "old"), ("2026-01-03T10:00:00+0000", "new")):
+                env = dict(os.environ, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when, TZ="UTC")
+                subprocess.run(["git", "-C", d, "-c", "user.name=a", "-c", "user.email=a@a",
+                                "commit", "-q", "--allow-empty", "-m", msg], check=True, env=env)
+            self.assertEqual([x.subject for x in read_commits(d, until="2025-01-01")], ["old"])
+            self.assertEqual(read_commits(d, since="2021-01-01", until="2025-01-01"), [])
+
     def test_lone_wolf(self):
         cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00") for i in range(20)]  # 20 commits, one author
         self.assertEqual(fortune(cs)["name"], "The Lone Wolf")
