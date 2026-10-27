@@ -84,6 +84,10 @@ class Rules(unittest.TestCase):
             self.assertEqual([x.subject for x in read_commits(d, until="2025-01-01")], ["old"])
             self.assertEqual(read_commits(d, since="2021-01-01", until="2025-01-01"), [])
 
+    def test_minimalist(self):
+        cs = [c(f"2026-02-{i + 1:02d}T10:00:00", subject="tidy") for i in range(12)]
+        self.assertEqual(fortune(cs)["name"], "The Minimalist")
+
     def test_sprinter(self):
         cs = [c(f"2026-02-03T{9 + i % 8:02d}:00:00") for i in range(12)] + [c("2026-02-10T10:00:00"), c("2026-02-17T10:00:00")]
         self.assertEqual(fortune(cs)["name"], "The Sprinter")
