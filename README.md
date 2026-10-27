@@ -38,7 +38,7 @@ Add `--json` to get the fortune and its numbers as data instead of the box, `--a
 
 ## What it does and why
 
-It counts a few plain things in your history (when you commit, how long your messages are, how often they say "fix") and picks the fortune that fits best. Eleven fortunes: Night Owl, Weekend Warrior, Firefighter, Mysterious One, Confetti Cannon, Early Bird, Novelist, Streaker, Lone Wolf, The Choir, and Steady Hand. A repo with no commits yet gets a twelfth, the Blank Page.
+It counts a few plain things in your history (when you commit, how long your messages are, how often they say "fix") and picks the fortune that fits best. Thirteen fortunes: Night Owl, Weekend Warrior, Firefighter, Mysterious One, Confetti Cannon, Early Bird, Novelist, Streaker, Minimalist, Sprinter, Lone Wolf, The Choir, and Steady Hand. A repo with no commits yet gets a fourteenth, the Blank Page.
 
 It is for fun and for screenshots. It never leaves your machine and never uses a model: the same history always gives the same fortune, so it is safe to argue about with your team.
 
