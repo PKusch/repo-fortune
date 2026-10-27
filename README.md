@@ -34,7 +34,7 @@ cd repo-fortune
 python3 -m repo_fortune /path/to/any/repo
 ```
 
-Add `--json` to get the fortune and its numbers as data instead of the box, `--author "Ann"` to read only one person's commits, `--markdown` to get a block you can paste into a README or issue, or `--since 2026-01-01` (or `--since "3 months ago"`) to read only newer history.
+Add `--json` to get the fortune and its numbers as data instead of the box, `--author "Ann"` to read only one person's commits, `--markdown` to get a block you can paste into a README or issue, or `--since 2026-01-01` (or `--since "3 months ago"`) to read only newer history, and `--until 2026-06-30` to stop at a date, which together with `--since` reads one window of history.
 
 ## What it does and why
 
