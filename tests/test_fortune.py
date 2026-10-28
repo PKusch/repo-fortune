@@ -88,6 +88,10 @@ class Rules(unittest.TestCase):
         cs = [c(f"2026-02-{i + 1:02d}T10:00:00", subject="tidy") for i in range(12)]
         self.assertEqual(fortune(cs)["name"], "The Minimalist")
 
+    def test_hibernator(self):
+        cs = [c(f"2026-01-{i + 5:02d}T10:00:00") for i in range(4)] + [c(f"2026-05-{i + 4:02d}T10:00:00") for i in range(4)]
+        self.assertEqual(fortune(cs)["name"], "The Hibernator")
+
     def test_sprinter(self):
         cs = [c(f"2026-02-03T{9 + i % 8:02d}:00:00") for i in range(12)] + [c("2026-02-10T10:00:00"), c("2026-02-17T10:00:00")]
         self.assertEqual(fortune(cs)["name"], "The Sprinter")
