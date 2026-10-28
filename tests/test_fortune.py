@@ -206,6 +206,17 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertEqual(json.loads(r.stdout)["stats"]["n"], 1)
 
+    def test_markdown_flag_prints_a_table_not_a_box(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            subprocess.run(["git", "-C", d, "-c", "user.name=a", "-c", "user.email=a@a",
+                            "commit", "-q", "--allow-empty", "-m", "x"], check=True)
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d, "--markdown"],
+                               cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("|", r.stdout)
+            self.assertNotIn("+----", r.stdout)
+
     def test_not_a_repo(self):
         with tempfile.TemporaryDirectory() as d:
             r = subprocess.run([sys.executable, "-m", "repo_fortune", d], cwd=ROOT,
