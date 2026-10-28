@@ -66,6 +66,12 @@ def longest_streak(days):
     return best
 
 
+def longest_gap(days):
+    """Longest stretch, in days, between two consecutive commit days."""
+    days = sorted(set(days))
+    return max(((b - a).days for a, b in zip(days, days[1:])), default=0)
+
+
 def stats(commits):
     n = len(commits)
     if n == 0:
@@ -91,6 +97,7 @@ def stats(commits):
         "avg_words": sum(words) / n,
         "one_word": sum(1 for w in words if w <= 1) / n,
         "streak": longest_streak(days),
+        "longest_gap": longest_gap(days),
         "active_days": len(set(days)),
         "busiest_day": Counter(days).most_common(1)[0],
         "busiest_weekday": weekday_counts.most_common(1)[0][0],

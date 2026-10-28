@@ -121,6 +121,11 @@ class Rules(unittest.TestCase):
         cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]
         self.assertEqual(fortune(cs)["name"], "The Steady Hand")
 
+    def test_longest_gap_counts_days_between_commit_days(self):
+        cs = [c("2026-01-01T10:00:00"), c("2026-01-02T10:00:00"), c("2026-03-03T10:00:00"), c("2026-03-04T10:00:00")]
+        self.assertEqual(fortune(cs)["stats"]["longest_gap"], 60)
+        self.assertEqual(fortune([c("2026-01-01T10:00:00")])["stats"]["longest_gap"], 0)
+
     def test_streak(self):
         days = [date(2026, 1, d) for d in (1, 2, 3, 5, 6)]
         self.assertEqual(longest_streak(days), 3)
