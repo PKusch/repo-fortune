@@ -192,6 +192,20 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(len(read_commits(d, author="bob")), 1)
             self.assertEqual(read_commits(d, author="nobody"), [])
 
+    def test_the_command_line_reads_a_window_with_since_and_until(self):
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            for when in ("2020-01-03T10:00:00+0000", "2023-01-03T10:00:00+0000", "2026-01-03T10:00:00+0000"):
+                env = dict(os.environ, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when)
+                subprocess.run(["git", "-C", d, "-c", "user.name=a", "-c", "user.email=a@a",
+                                "commit", "-q", "--allow-empty", "-m", "x"], check=True, env=env)
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d, "--json",
+                                "--since", "2021-01-01", "--until", "2025-01-01"],
+                               cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(json.loads(r.stdout)["stats"]["n"], 1)
+
     def test_not_a_repo(self):
         with tempfile.TemporaryDirectory() as d:
             r = subprocess.run([sys.executable, "-m", "repo_fortune", d], cwd=ROOT,
