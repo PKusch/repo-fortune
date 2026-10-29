@@ -130,6 +130,11 @@ class Rules(unittest.TestCase):
         self.assertEqual(fortune(cs)["stats"]["longest_gap"], 60)
         self.assertEqual(fortune([c("2026-01-01T10:00:00")])["stats"]["longest_gap"], 0)
 
+    def test_the_box_and_the_table_show_the_longest_gap(self):
+        from repo_fortune.core import render
+        cs = [c("2026-01-05T10:00:00"), c("2026-03-09T10:00:00")]
+        self.assertIn("longest gap      63 days", render(cs))
+
     def test_streak(self):
         days = [date(2026, 1, d) for d in (1, 2, 3, 5, 6)]
         self.assertEqual(longest_streak(days), 3)
