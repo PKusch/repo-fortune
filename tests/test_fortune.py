@@ -109,6 +109,14 @@ class Rules(unittest.TestCase):
         cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author=names[i % 5]) for i in range(10)]
         self.assertEqual(fortune(cs)["name"], "The Choir")
 
+    def test_duet(self):
+        cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author="ab"[i % 2]) for i in range(10)]
+        self.assertEqual(fortune(cs)["name"], "The Duet")
+
+    def test_two_authors_with_one_dominant_are_not_a_duet(self):
+        cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author="a" if i < 9 else "b") for i in range(10)]
+        self.assertNotEqual(fortune(cs)["name"], "The Duet")
+
     def test_markdown_has_the_name_the_reading_and_a_table(self):
         cs = [c("2026-01-05T10:00:00"), c("2026-01-06T11:00:00")]
         md = render_markdown(cs)
