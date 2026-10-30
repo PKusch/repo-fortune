@@ -85,7 +85,7 @@ class Rules(unittest.TestCase):
             self.assertEqual(read_commits(d, since="2021-01-01", until="2025-01-01"), [])
 
     def test_minimalist(self):
-        cs = [c(f"2026-02-{i + 1:02d}T10:00:00", subject="tidy") for i in range(12)]
+        cs = [c(f"2026-02-{i + 1:02d}T10:00:00", subject="more") for i in range(12)]
         self.assertEqual(fortune(cs)["name"], "The Minimalist")
 
     def test_hibernator(self):
@@ -112,6 +112,14 @@ class Rules(unittest.TestCase):
     def test_lunch_break_coder(self):
         cs = [c(f"2026-01-{d:02d}T12:30:00") for d in range(5, 10)]
         self.assertEqual(fortune(cs)["name"], "The Lunch-Break Coder")
+
+    def test_gardener(self):
+        cs = [c(f"2026-01-{d:02d}T10:00:00", "refactor the parser") for d in range(5, 9)]
+        self.assertEqual(fortune(cs)["name"], "The Gardener")
+
+    def test_librarian(self):
+        cs = [c(f"2026-01-{d:02d}T10:00:00", "update the README") for d in range(5, 9)]
+        self.assertEqual(fortune(cs)["name"], "The Librarian")
 
     def test_duet(self):
         cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author="ab"[i % 2]) for i in range(10)]
