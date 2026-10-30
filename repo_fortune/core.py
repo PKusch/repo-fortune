@@ -51,6 +51,8 @@ def read_commits(path=".", author=None, since=None, until=None):
 
 FIX_WORDS = re.compile(r"\b(fix|fixes|fixed|bug|hotfix|oops|revert|typo)\b", re.I)
 WIP_WORDS = re.compile(r"^(wip|tmp|temp|asdf|stuff|update|changes|misc|\.+)$", re.I)
+REFACTOR_WORDS = re.compile(r"\b(refactor\w*|clean ?up|rename[sd]?|tidy|simplif\w*|reorgani[sz]\w*)\b", re.I)
+DOC_WORDS = re.compile(r"\b(docs?|readme|documentation|changelog|comments?)\b", re.I)
 EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 
 
@@ -93,6 +95,9 @@ def stats(commits):
         "weekend": sum(1 for c in commits if c.when.weekday() >= 5) / n,
         "fix": sum(1 for s in subjects if FIX_WORDS.search(s)) / n,
         "wip": sum(1 for s in subjects if WIP_WORDS.match(s)) / n,
+        "lunch": sum(1 for h in hours if 12 <= h < 14) / n,
+        "refactor": sum(1 for s in subjects if REFACTOR_WORDS.search(s)) / n,
+        "docs": sum(1 for s in subjects if DOC_WORDS.search(s)) / n,
         "emoji": sum(1 for s in subjects if EMOJI.search(s)) / n,
         "avg_words": sum(words) / n,
         "one_word": sum(1 for w in words if w <= 1) / n,
