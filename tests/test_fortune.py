@@ -109,6 +109,10 @@ class Rules(unittest.TestCase):
         cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author=names[i % 5]) for i in range(10)]
         self.assertEqual(fortune(cs)["name"], "The Choir")
 
+    def test_lunch_break_coder(self):
+        cs = [c(f"2026-01-{d:02d}T12:30:00") for d in range(5, 10)]
+        self.assertEqual(fortune(cs)["name"], "The Lunch-Break Coder")
+
     def test_duet(self):
         cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author="ab"[i % 2]) for i in range(10)]
         self.assertEqual(fortune(cs)["name"], "The Duet")
