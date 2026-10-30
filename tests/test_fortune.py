@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from datetime import date, datetime
 
-from repo_fortune.core import (Commit, fortune, longest_streak, lucky_number,
+from repo_fortune.core import (ARCHETYPES, Commit, fortune, longest_streak, lucky_number,
                                read_commits, render, render_markdown, stats)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -120,6 +120,19 @@ class Rules(unittest.TestCase):
     def test_librarian(self):
         cs = [c(f"2026-01-{d:02d}T10:00:00", "update the README") for d in range(5, 9)]
         self.assertEqual(fortune(cs)["name"], "The Librarian")
+
+    def test_every_archetype_has_a_unique_name_and_a_reading(self):
+        names = [a[1] for a in ARCHETYPES]
+        self.assertEqual(len(names), len(set(names)))
+        for _, name, reading in ARCHETYPES:
+            self.assertTrue(name.startswith("The "), name)
+            self.assertGreater(len(reading.split()), 5, name)
+
+    def test_the_readme_lists_every_fortune(self):
+        readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+        for _, name, _ in ARCHETYPES:
+            short = name[4:] if name != "The Choir" and name != "The Duet" else name
+            self.assertIn(short, readme, name)
 
     def test_duet(self):
         cs = [c(f"2026-02-{(i % 8) * 3 + 1:02d}T10:00:00", author="ab"[i % 2]) for i in range(10)]
