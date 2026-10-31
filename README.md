@@ -19,7 +19,10 @@ $ python3 -m repo_fortune
 | night commits    16%                             |
 | weekend commits  16%                             |
 | 'fix' commits    3%                              |
+| refactor commits 0%                              |
+| docs commits     19%                             |
 | longest streak   5 days                          |
+| longest gap      11 days                         |
 | lucky number     77                              |
 +--------------------------------------------------+
 ```
