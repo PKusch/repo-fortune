@@ -264,6 +264,13 @@ class RealRepo(unittest.TestCase):
             self.assertIn("|", r.stdout)
             self.assertNotIn("+----", r.stdout)
 
+    def test_the_box_and_the_table_show_refactor_and_docs_shares(self):
+        cs = [c("2026-01-05T10:00:00", "refactor parser"), c("2026-01-06T10:00:00", "update README"),
+              c("2026-01-07T10:00:00", "add thing"), c("2026-01-08T10:00:00", "add other")]
+        self.assertIn("refactor commits 25%", render(cs))
+        self.assertIn("docs commits     25%", render(cs))
+        self.assertIn("| docs commits | 25% |", render_markdown(cs))
+
     def test_list_prints_every_fortune_without_reading_a_repo(self):
         from repo_fortune.cli import main
         import contextlib, io
