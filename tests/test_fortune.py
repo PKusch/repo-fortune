@@ -264,6 +264,17 @@ class RealRepo(unittest.TestCase):
             self.assertIn("|", r.stdout)
             self.assertNotIn("+----", r.stdout)
 
+    def test_list_prints_every_fortune_without_reading_a_repo(self):
+        from repo_fortune.cli import main
+        import contextlib, io
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            code = main(["--list", "/no/such/place"])
+        self.assertEqual(code, 0)
+        lines = buf.getvalue().strip().splitlines()
+        self.assertEqual(len(lines), len(ARCHETYPES))
+        self.assertTrue(all(l.startswith("The ") for l in lines))
+
     def test_not_a_repo(self):
         with tempfile.TemporaryDirectory() as d:
             r = subprocess.run([sys.executable, "-m", "repo_fortune", d], cwd=ROOT,

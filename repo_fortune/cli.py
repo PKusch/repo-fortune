@@ -3,7 +3,7 @@ import json
 import sys
 
 from . import __version__
-from .core import fortune, read_commits, render, render_markdown
+from .core import ARCHETYPES, fortune, read_commits, render, render_markdown
 
 
 def main(argv=None):
@@ -18,7 +18,13 @@ def main(argv=None):
                    help="print the fortune as a Markdown block to paste into a README or issue")
     p.add_argument("--json", action="store_true",
                    help="print the fortune and its numbers as JSON")
+    p.add_argument("--list", action="store_true", dest="list_fortunes",
+                   help="print every fortune there is and exit")
     args = p.parse_args(argv)
+    if args.list_fortunes:
+        for _, name, reading in ARCHETYPES:
+            print(f"{name}: {reading}")
+        return 0
     try:
         commits = read_commits(args.path, author=args.author, since=args.since, until=args.until)
     except RuntimeError as e:
