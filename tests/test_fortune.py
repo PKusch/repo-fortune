@@ -276,6 +276,11 @@ class RealRepo(unittest.TestCase):
         self.assertEqual(favourite_word(["add the", "fix a"]), None)
         self.assertEqual(favourite_word(["Parser", "PARSER again"]), "parser")
 
+    def test_the_box_and_the_table_show_the_favourite_word(self):
+        cs = [c("2026-01-05T10:00:00", "tune parser"), c("2026-01-06T10:00:00", "parser tests")]
+        self.assertIn("favourite word   parser", render(cs))
+        self.assertIn("| favourite word | parser |", render_markdown(cs))
+
     def test_list_prints_every_fortune_without_reading_a_repo(self):
         from repo_fortune.cli import main
         import contextlib, io

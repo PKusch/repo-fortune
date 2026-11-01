@@ -234,6 +234,7 @@ def render(commits, width=52):
             f"docs commits     {_pct(s['docs'])}",
             f"longest streak   {s['streak']} day{'s' * (s['streak'] != 1)}",
             f"longest gap      {s['longest_gap']} day{'s' * (s['longest_gap'] != 1)}",
+            f"favourite word   {s['favourite_word'] or '-'}",
             f"lucky number     {lucky_number(commits)}",
         ]
     top = "+" + "-" * (width - 2) + "+"
@@ -274,6 +275,7 @@ def render_markdown(commits):
             f"| docs commits | {_pct(s['docs'])} |",
             f"| longest streak | {s['streak']} day{'s' * (s['streak'] != 1)} |",
             f"| longest gap | {s['longest_gap']} day{'s' * (s['longest_gap'] != 1)} |",
+            f"| favourite word | {s['favourite_word'] or '-'} |",
             f"| lucky number | {lucky_number(commits)} |",
         ]
     return "\n".join(out)
