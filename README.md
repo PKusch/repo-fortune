@@ -23,6 +23,7 @@ $ python3 -m repo_fortune
 | docs commits     19%                             |
 | longest streak   5 days                          |
 | longest gap      11 days                         |
+| favourite word   parser                          |
 | lucky number     77                              |
 +--------------------------------------------------+
 ```
