@@ -74,6 +74,23 @@ def longest_gap(days):
     return max(((b - a).days for a, b in zip(days, days[1:])), default=0)
 
 
+STOP_WORDS = set("a an and the to of in on for with from by at as is it this that add added fix fixes fixed update updated remove removed use used make made into more".split())
+
+
+def favourite_word(subjects):
+    """The most common word across commit subjects, ignoring small filler words.
+    Ties go to the word seen first, so the answer never changes between runs."""
+    seen = {}
+    for sub in subjects:
+        for w in re.findall(r"[A-Za-z][A-Za-z'-]{2,}", sub.lower()):
+            if w not in STOP_WORDS:
+                seen[w] = seen.get(w, 0) + 1
+    if not seen:
+        return None
+    best = max(seen.values())
+    return next(w for w, n in seen.items() if n == best)
+
+
 def stats(commits):
     n = len(commits)
     if n == 0:
@@ -95,6 +112,7 @@ def stats(commits):
         "weekend": sum(1 for c in commits if c.when.weekday() >= 5) / n,
         "fix": sum(1 for s in subjects if FIX_WORDS.search(s)) / n,
         "wip": sum(1 for s in subjects if WIP_WORDS.match(s)) / n,
+        "favourite_word": favourite_word(subjects),
         "lunch": sum(1 for h in hours if 12 <= h < 14) / n,
         "refactor": sum(1 for s in subjects if REFACTOR_WORDS.search(s)) / n,
         "docs": sum(1 for s in subjects if DOC_WORDS.search(s)) / n,

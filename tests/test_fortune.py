@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from datetime import date, datetime
 
-from repo_fortune.core import (ARCHETYPES, Commit, fortune, longest_streak, lucky_number,
+from repo_fortune.core import (ARCHETYPES, Commit, favourite_word, fortune, longest_streak, lucky_number,
                                read_commits, render, render_markdown, stats)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -270,6 +270,11 @@ class RealRepo(unittest.TestCase):
         self.assertIn("refactor commits 25%", render(cs))
         self.assertIn("docs commits     25%", render(cs))
         self.assertIn("| docs commits | 25% |", render_markdown(cs))
+
+    def test_favourite_word_skips_filler_and_ties_go_to_the_first_seen(self):
+        self.assertEqual(favourite_word(["add the parser", "parser tests", "the tests"]), "parser")
+        self.assertEqual(favourite_word(["add the", "fix a"]), None)
+        self.assertEqual(favourite_word(["Parser", "PARSER again"]), "parser")
 
     def test_list_prints_every_fortune_without_reading_a_repo(self):
         from repo_fortune.cli import main
