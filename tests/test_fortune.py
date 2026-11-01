@@ -281,6 +281,16 @@ class RealRepo(unittest.TestCase):
         self.assertIn("favourite word   parser", render(cs))
         self.assertIn("| favourite word | parser |", render_markdown(cs))
 
+    def test_the_readme_counts_the_fortunes_correctly(self):
+        words = {18: "Eighteen"}
+        readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+        self.assertIn(f"{words.get(len(ARCHETYPES), '?')} fortunes", readme)
+
+    def test_the_changelog_has_an_entry_for_the_current_version(self):
+        from repo_fortune import __version__
+        log = open(os.path.join(ROOT, "CHANGELOG.md"), encoding="utf-8").read()
+        self.assertIn(f"## {__version__}", log)
+
     def test_list_prints_every_fortune_without_reading_a_repo(self):
         from repo_fortune.cli import main
         import contextlib, io
