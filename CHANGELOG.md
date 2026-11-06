@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- An impossible date such as `--since 2026-02-30` is refused in one line instead of being read as some other day.
 - `--author` matches the text as written and in any case: `a.b@x.com` no longer also matches `axb@x.com`.
 - A bare date in `--since` or `--until` now means the whole day. git read `--since 2026-01-01` as 1 January at the current clock time, so the same command gave a different fortune depending on when it ran.
 - Reads author names and commit messages correctly on a machine that is not set to UTF-8, where a name like "José" used to crash it.

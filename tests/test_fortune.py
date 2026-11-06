@@ -294,6 +294,16 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertEqual(json.loads(r.stdout)["stats"]["n"], 2)
 
+    def test_an_impossible_date_is_refused_in_one_line(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            self._commit(d, "2026-01-05T10:00:00+0000")
+            for flag, value in (("--since", "2026-02-30"), ("--until", "2026-13-01")):
+                r = subprocess.run([sys.executable, "-m", "repo_fortune", d, flag, value],
+                                   cwd=ROOT, capture_output=True, text=True)
+                self.assertEqual(r.returncode, 1, r.stdout)
+                self.assertEqual(r.stderr.strip(), f"repo-fortune: '{value}' is not a real date")
+
     def test_an_empty_repo_is_the_blank_page_when_git_speaks_another_language(self):
         # git translates its "no commits yet" message; this stands in a git that
         # answers in German and passes every other call to the real one.

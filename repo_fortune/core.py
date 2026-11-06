@@ -7,7 +7,7 @@ import re
 import subprocess
 from collections import Counter
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 SEP = "\x1f"
 
@@ -29,6 +29,11 @@ def whole_day(value, end):
     to its last. Anything else ('3 months ago', a full timestamp) goes to git as
     written."""
     if value and BARE_DATE.fullmatch(value.strip()):
+        try:
+            date.fromisoformat(value.strip())
+        except ValueError:
+            # git quietly reads 2026-02-30 as some other day rather than refuse it
+            raise RuntimeError(f"{value.strip()!r} is not a real date") from None
         return f"{value.strip()} {'23:59:59' if end else '00:00:00'}"
     return value
 
