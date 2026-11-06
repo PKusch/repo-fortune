@@ -55,7 +55,7 @@ class Rules(unittest.TestCase):
         self.assertEqual(fortune(cs)["name"], "The Streaker")
 
     def test_a_commit_made_in_utc_is_read(self):
-        # git can print a UTC time with a trailing Z, which Python 3.9 rejects
+        # git can print a UTC time with a trailing Z, which Python before 3.11 rejects
         with tempfile.TemporaryDirectory() as d:
             subprocess.run(["git", "init", "-q", d], check=True)
             env = dict(os.environ, GIT_AUTHOR_DATE="2026-01-03T02:00:00+0000",

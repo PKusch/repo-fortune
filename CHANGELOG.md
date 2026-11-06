@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Needs Python 3.10 or newer. Python 3.9 no longer gets fixes, and GitHub's test machines no longer offer it.
+
 ## 0.2.0
 - Seven new fortunes: The Duet, The Lunch-Break Coder, The Gardener, The Librarian, The Hibernator, The Sprinter and The Minimalist. Eighteen in all.
 - The box and the table show the longest gap between commit days, the share of refactor and docs commits, and the favourite word.

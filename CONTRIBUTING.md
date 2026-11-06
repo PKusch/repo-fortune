@@ -16,4 +16,4 @@ python3 -m repo_fortune /path/to/any/repo
 python3 -m repo_fortune --list   # every fortune and its reading
 ```
 
-Nothing to install. It needs Python 3.9+ and git, and it stays free of outside packages and models, so the same history always gives the same fortune.
+Nothing to install. It needs Python 3.10+ and git, and it stays free of outside packages and models, so the same history always gives the same fortune.

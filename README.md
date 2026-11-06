@@ -30,7 +30,7 @@ $ python3 -m repo_fortune
 
 ## Try it
 
-Nothing to install. It needs Python 3.9+ and git.
+Nothing to install. It needs Python 3.10+ and git.
 
 ```bash
 git clone https://github.com/PKusch/repo-fortune
