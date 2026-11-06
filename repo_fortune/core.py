@@ -19,27 +19,64 @@ class Commit:
     subject: str
 
 
+BARE_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def whole_day(value, end):
+    """git reads a bare date like 2026-06-30 as that day at the current clock
+    time, so the same --since or --until gave a different history depending on
+    when it ran. A bare date means the whole day: from its first second, or up
+    to its last. Anything else ('3 months ago', a full timestamp) goes to git as
+    written."""
+    if value and BARE_DATE.fullmatch(value.strip()):
+        return f"{value.strip()} {'23:59:59' if end else '00:00:00'}"
+    return value
+
+
+def _git(path, *args):
+    return subprocess.run(
+        ["git", "-C", path, *args],
+        capture_output=True, encoding="utf-8", errors="replace", check=True,
+    ).stdout
+
+
+def _has_no_commits(path):
+    """True for a real git repo whose current branch has no commits yet. Asked
+    of git directly, not read from its error message, which git translates."""
+    try:
+        _git(path, "rev-parse", "--git-dir")
+    except (OSError, subprocess.CalledProcessError):
+        return False
+    try:
+        _git(path, "rev-parse", "--verify", "--quiet", "HEAD")
+    except subprocess.CalledProcessError:
+        return True
+    return False
+
+
 def read_commits(path=".", author=None, since=None, until=None):
     """Return commits oldest-first (empty for a repo with no commits yet).
 
     Raises RuntimeError if the path is not a git repo."""
     fmt = SEP.join(["%an", "%aI", "%s"])
+    since, until = whole_day(since, end=False), whole_day(until, end=True)
     try:
-        out = subprocess.run(
-            ["git", "-C", path, "log", "--no-merges", f"--format={fmt}"]
-            + ([f"--author={author}"] if author else [])
-            + ([f"--since={since}"] if since else [])
-            + ([f"--until={until}"] if until else []),
-            capture_output=True, text=True, check=True,
-        ).stdout
+        # git writes names and subjects as UTF-8 unless told otherwise, whatever
+        # the machine's language setting, so read them as UTF-8 too.
+        out = _git(
+            path, "-c", "i18n.logOutputEncoding=UTF-8", "log", "--no-merges", f"--format={fmt}",
+            *([f"--author={author}"] if author else []),
+            *([f"--since={since}"] if since else []),
+            *([f"--until={until}"] if until else []),
+        )
     except FileNotFoundError as e:
         raise RuntimeError(f"could not read git history in {path!r}") from e
     except subprocess.CalledProcessError as e:
-        if "does not have any commits" in (e.stderr or ""):
+        if _has_no_commits(path):
             return []  # a real repo with no commits yet: the Blank Page
         raise RuntimeError(f"could not read git history in {path!r}") from e
     commits = []
-    for line in out.splitlines():
+    for line in out.split("\n"):
         parts = line.split(SEP, 2)
         if len(parts) != 3:
             continue
@@ -82,7 +119,8 @@ def favourite_word(subjects):
     Ties go to the word seen first, so the answer never changes between runs."""
     seen = {}
     for sub in subjects:
-        for w in re.findall(r"[A-Za-z][A-Za-z'-]{2,}", sub.lower()):
+        # Letters in any alphabet, so "größe" is a word and not "gr" and "ße".
+        for w in re.findall(r"[^\W\d_](?:[^\W\d_]|['-]){2,}", sub.lower()):
             if w not in STOP_WORDS:
                 seen[w] = seen.get(w, 0) + 1
     if not seen:
@@ -238,8 +276,14 @@ def render(commits, width=52):
             f"lucky number     {lucky_number(commits)}",
         ]
     top = "+" + "-" * (width - 2) + "+"
-    body = [top] + [f"| {l:<{width - 4}} |" for l in lines] + [top]
+    body = [top] + [f"| {fit(l, width - 4):<{width - 4}} |" for l in lines] + [top]
     return "\n".join(body)
+
+
+def fit(line, width):
+    """Cut a line that would push the box's right edge out, such as a long
+    hyphenated favourite word, and show that it was cut."""
+    return line if len(line) <= width else line[:width - 3] + "..."
 
 
 def wrap(text, width):

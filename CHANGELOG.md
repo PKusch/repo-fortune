@@ -1,6 +1,11 @@
 # Changelog
 
 ## Unreleased
+- A bare date in `--since` or `--until` now means the whole day. git read `--since 2026-01-01` as 1 January at the current clock time, so the same command gave a different fortune depending on when it ran.
+- Reads author names and commit messages correctly on a machine that is not set to UTF-8, where a name like "José" used to crash it.
+- The favourite word counts letters in any alphabet: "Größe ändern" gave "ndern", now "größe".
+- A repo with no commits is The Blank Page even when git speaks another language.
+- A very long favourite word no longer breaks the edge of the box.
 - Needs Python 3.10 or newer. Python 3.9 no longer gets fixes, and GitHub's test machines no longer offer it.
 
 ## 0.2.0

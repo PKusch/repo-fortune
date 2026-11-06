@@ -21,6 +21,9 @@ def main(argv=None):
     p.add_argument("--list", action="store_true", dest="list_fortunes",
                    help="print every fortune there is and exit")
     args = p.parse_args(argv)
+    # A favourite word like "größe" must not crash a console that cannot show it.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
     if args.list_fortunes:
         for _, name, reading in ARCHETYPES:
             print(f"{name}: {reading}")

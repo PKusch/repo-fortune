@@ -239,6 +239,74 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(len(read_commits(d, author="bob")), 1)
             self.assertEqual(read_commits(d, author="nobody"), [])
 
+    def _commit(self, d, when, subject="x", name="a"):
+        env = dict(os.environ, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when)
+        subprocess.run(["git", "-C", d, "-c", f"user.name={name}", "-c", "user.email=a@a",
+                        "commit", "-q", "--allow-empty", "-m", subject], check=True, env=env)
+
+    def test_names_and_subjects_are_read_as_utf8_on_a_machine_not_set_to_utf8(self):
+        # A machine whose language setting is not UTF-8 (common on Windows) used to
+        # decode git's output with that setting and crash on the first "é".
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            self._commit(d, "2026-01-05T10:00:00+0000", "café crème", name="José Müller")
+            env = dict(os.environ, LC_ALL="C", LANG="C", PYTHONUTF8="0",
+                       PYTHONCOERCECLOCALE="0", PYTHONIOENCODING="ascii")
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d, "--json"],
+                               cwd=ROOT, capture_output=True, env=env)
+            self.assertEqual(r.returncode, 0, r.stderr.decode("utf-8", "replace"))
+            self.assertEqual(json.loads(r.stdout)["stats"]["n"], 1)
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d],
+                               cwd=ROOT, capture_output=True, env=env)
+            self.assertEqual(r.returncode, 0, r.stderr.decode("utf-8", "replace"))
+
+    def test_a_line_separator_inside_a_name_or_subject_does_not_split_the_commit(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            self._commit(d, "2026-01-05T10:00:00+0000", "line sep", name="A\u0085B")
+            (only,) = read_commits(d)
+            self.assertEqual((only.author, only.subject), ("A\u0085B", "line sep"))
+
+    def test_a_bare_date_means_the_whole_day_whatever_the_time_now(self):
+        # git reads --since 2026-01-01 as 1 January at the current clock time, so a
+        # commit early on the 1st was in or out depending on when you ran it.
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            for when in ("2025-12-31T23:59:30+0000", "2026-01-01T00:00:30+0000",
+                         "2026-06-30T23:59:30+0000", "2026-07-01T00:00:30+0000"):
+                self._commit(d, when)
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d, "--json",
+                                "--since", "2026-01-01", "--until", "2026-06-30"],
+                               cwd=ROOT, capture_output=True, text=True, env=dict(os.environ, TZ="UTC"))
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(json.loads(r.stdout)["stats"]["n"], 2)
+
+    def test_an_empty_repo_is_the_blank_page_when_git_speaks_another_language(self):
+        # git translates its "no commits yet" message; this stands in a git that
+        # answers in German and passes every other call to the real one.
+        import shutil
+        real = shutil.which("git")
+        with tempfile.TemporaryDirectory() as d, tempfile.TemporaryDirectory() as bindir:
+            fake = os.path.join(bindir, "git")
+            with open(fake, "w", encoding="utf-8") as f:
+                f.write(f"#!{sys.executable}\n"
+                        "import subprocess, sys\n"
+                        f"r = subprocess.run([{real!r}, *sys.argv[1:]], capture_output=True)\n"
+                        "if r.returncode and 'log' in sys.argv:\n"
+                        "    sys.stderr.write(\"fatal: Ihr aktueller Branch 'main' hat noch keine Commits.\\n\")\n"
+                        "    sys.exit(r.returncode)\n"
+                        "sys.stdout.buffer.write(r.stdout); sys.stderr.buffer.write(r.stderr)\n"
+                        "sys.exit(r.returncode)\n")
+            os.chmod(fake, 0o755)
+            subprocess.run(["git", "init", "-q", d], check=True)
+            env = dict(os.environ, PATH=bindir + os.pathsep + os.environ["PATH"])
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d], cwd=ROOT,
+                               capture_output=True, text=True, env=env)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("BLANK PAGE", r.stdout)
+
     def test_the_command_line_reads_a_window_with_since_and_until(self):
         import json
         with tempfile.TemporaryDirectory() as d:
@@ -275,6 +343,15 @@ class RealRepo(unittest.TestCase):
         self.assertEqual(favourite_word(["add the parser", "parser tests", "the tests"]), "parser")
         self.assertEqual(favourite_word(["add the", "fix a"]), None)
         self.assertEqual(favourite_word(["Parser", "PARSER again"]), "parser")
+
+    def test_favourite_word_reads_letters_in_any_alphabet(self):
+        self.assertEqual(favourite_word(["Größe ändern", "Größe prüfen"]), "größe")
+
+    def test_a_long_favourite_word_does_not_push_out_the_edge_of_the_box(self):
+        cs = [c(f"2026-01-0{d}T10:00:00", "internationalisation-and-localisation-overhaul") for d in (1, 2, 3)]
+        widths = {len(line) for line in render(cs).splitlines()}
+        self.assertEqual(widths, {52})
+        self.assertIn("...", render(cs))
 
     def test_the_box_and_the_table_show_the_favourite_word(self):
         cs = [c("2026-01-05T10:00:00", "tune parser"), c("2026-01-06T10:00:00", "parser tests")]
