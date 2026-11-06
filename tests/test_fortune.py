@@ -294,6 +294,16 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertEqual(json.loads(r.stdout)["stats"]["n"], 2)
 
+    def test_a_filter_that_matches_nothing_says_so_rather_than_a_blank_page(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            self._commit(d, "2026-01-05T10:00:00+0000")
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", d, "--author", "nobody"],
+                               cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(r.returncode, 1)
+            self.assertNotIn("BLANK PAGE", r.stdout)
+            self.assertEqual(r.stderr.strip(), "repo-fortune: no commits match --author 'nobody'")
+
     def test_an_impossible_date_is_refused_in_one_line(self):
         with tempfile.TemporaryDirectory() as d:
             subprocess.run(["git", "init", "-q", d], check=True)

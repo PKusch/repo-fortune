@@ -33,6 +33,12 @@ def main(argv=None):
     except RuntimeError as e:
         print(f"repo-fortune: {e}", file=sys.stderr)
         return 1
+    filters = [f"--{k} {v!r}" for k, v in (("author", args.author), ("since", args.since), ("until", args.until)) if v]
+    if not commits and filters:
+        # The Blank Page means a repo with no history yet. Saying it about a
+        # repo whose commits a filter left out would be a fortune about a typo.
+        print(f"repo-fortune: no commits match {' '.join(filters)}", file=sys.stderr)
+        return 1
     if args.json:
         f = fortune(commits)
         stats = {k: (v.isoformat() if hasattr(v, "isoformat") else v)
