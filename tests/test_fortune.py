@@ -239,6 +239,17 @@ class RealRepo(unittest.TestCase):
             self.assertEqual(len(read_commits(d, author="bob")), 1)
             self.assertEqual(read_commits(d, author="nobody"), [])
 
+    def test_author_is_matched_as_written_not_as_a_pattern(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            for email in ("a.b@x.com", "axb@x.com", "c+d@x.com"):
+                subprocess.run(["git", "-C", d, "-c", "user.name=n", "-c", f"user.email={email}",
+                                "commit", "-q", "--allow-empty", "-m", "x"], check=True)
+            self.assertEqual(len(read_commits(d, author="a.b@x.com")), 1)
+            self.assertEqual(len(read_commits(d, author="A.B@X.COM")), 1)
+            self.assertEqual(len(read_commits(d, author="c+d@x.com")), 1)
+            self.assertEqual(read_commits(d, author="C["), [])
+
     def _commit(self, d, when, subject="x", name="a"):
         env = dict(os.environ, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when)
         subprocess.run(["git", "-C", d, "-c", f"user.name={name}", "-c", "user.email=a@a",

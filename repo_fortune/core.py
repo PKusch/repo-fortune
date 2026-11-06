@@ -65,7 +65,10 @@ def read_commits(path=".", author=None, since=None, until=None):
         # the machine's language setting, so read them as UTF-8 too.
         out = _git(
             path, "-c", "i18n.logOutputEncoding=UTF-8", "log", "--no-merges", f"--format={fmt}",
-            *([f"--author={author}"] if author else []),
+            # git reads --author as a pattern, so "a.b@x.com" also matched
+            # "axb@x.com" and "C[" was an error. Match the text as written,
+            # in any case, as email addresses are.
+            *(["--fixed-strings", "--regexp-ignore-case", f"--author={author}"] if author else []),
             *([f"--since={since}"] if since else []),
             *([f"--until={until}"] if until else []),
         )
