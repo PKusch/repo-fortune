@@ -384,6 +384,13 @@ class RealRepo(unittest.TestCase):
         self.assertEqual(widths, {52})
         self.assertIn("...", render(cs))
 
+    def test_a_wide_favourite_word_keeps_the_box_edge_straight(self):
+        # Chinese, Japanese and Korean characters take two columns on screen.
+        from repo_fortune.core import columns
+        for word in ("修正しました", "国際化対応国際化対応国際化対応国際化対応国際化対応"):
+            cs = [c(f"2026-01-0{d}T10:00:00", word) for d in (1, 2, 3)]
+            self.assertEqual({columns(line) for line in render(cs).splitlines()}, {52}, word)
+
     def test_the_box_and_the_table_show_the_favourite_word(self):
         cs = [c("2026-01-05T10:00:00", "tune parser"), c("2026-01-06T10:00:00", "parser tests")]
         self.assertIn("favourite word   parser", render(cs))

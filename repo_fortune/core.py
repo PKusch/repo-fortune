@@ -5,6 +5,7 @@ The same history always gives the same fortune.
 """
 import re
 import subprocess
+import unicodedata
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -284,14 +285,24 @@ def render(commits, width=52):
             f"lucky number     {lucky_number(commits)}",
         ]
     top = "+" + "-" * (width - 2) + "+"
-    body = [top] + [f"| {fit(l, width - 4):<{width - 4}} |" for l in lines] + [top]
+    body = [top] + [f"| {fit(l, width - 4)} |" for l in lines] + [top]
     return "\n".join(body)
 
 
+def columns(text):
+    """How many terminal columns text takes: Chinese, Japanese and Korean
+    characters take two, so counting characters let them push the edge out."""
+    return sum(2 if unicodedata.east_asian_width(ch) in "WF" else 1 for ch in text)
+
+
 def fit(line, width):
-    """Cut a line that would push the box's right edge out, such as a long
-    hyphenated favourite word, and show that it was cut."""
-    return line if len(line) <= width else line[:width - 3] + "..."
+    """Pad a line to exactly `width` columns, cutting one that would push the
+    box's right edge out (a long favourite word) and showing that it was cut."""
+    if columns(line) > width:
+        while columns(line) > width - 3:
+            line = line[:-1]
+        line += "..."
+    return line + " " * (width - columns(line))
 
 
 def wrap(text, width):
