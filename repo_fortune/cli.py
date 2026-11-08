@@ -21,11 +21,15 @@ def main(argv=None):
     fmt.add_argument("--json", action="store_true",
                      help="print the fortune and its numbers as JSON")
     p.add_argument("--list", action="store_true", dest="list_fortunes",
-                   help="print every fortune there is and exit")
+                   help="print every fortune there is and exit (as JSON with --json)")
     args = p.parse_args(argv)
     # A favourite word like "größe" must not crash a console that cannot show it.
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(errors="replace")
+    if args.list_fortunes and args.json:
+        # --json used to be ignored here, printing text a script could not read
+        print(json.dumps([{"fortune": name, "reading": reading} for _, name, reading in ARCHETYPES], indent=2))
+        return 0
     if args.list_fortunes:
         for _, name, reading in ARCHETYPES:
             print(f"{name}: {reading}")

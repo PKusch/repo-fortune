@@ -412,6 +412,14 @@ class RealRepo(unittest.TestCase):
         self.assertEqual(r.returncode, 2)
         self.assertIn("not allowed with argument", r.stderr)
 
+    def test_list_with_json_prints_every_fortune_as_json(self):
+        import json
+        r = subprocess.run([sys.executable, "-m", "repo_fortune", "--list", "--json"],
+                           cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        out = json.loads(r.stdout)
+        self.assertEqual([f["fortune"] for f in out], [name for _, name, _ in ARCHETYPES])
+
     def test_list_prints_every_fortune_without_reading_a_repo(self):
         from repo_fortune.cli import main
         import contextlib, io
