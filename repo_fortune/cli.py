@@ -23,6 +23,11 @@ def main(argv=None):
     p.add_argument("--list", action="store_true", dest="list_fortunes",
                    help="print every fortune there is and exit (as JSON with --json)")
     args = p.parse_args(argv)
+    # An empty value, say from an unset shell variable, used to mean "no filter"
+    # and read every commit, as if the filter had matched them all.
+    for flag in ("author", "since", "until"):
+        if getattr(args, flag) is not None and not getattr(args, flag).strip():
+            p.error(f"--{flag} is empty; leave it out to read every commit")
     # A favourite word like "größe" must not crash a console that cannot show it.
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(errors="replace")

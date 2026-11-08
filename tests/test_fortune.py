@@ -406,6 +406,13 @@ class RealRepo(unittest.TestCase):
         log = open(os.path.join(ROOT, "CHANGELOG.md"), encoding="utf-8").read()
         self.assertIn(f"## {__version__}", log)
 
+    def test_an_empty_filter_is_a_usage_error_not_every_commit(self):
+        for flag in ("--author", "--since", "--until"):
+            r = subprocess.run([sys.executable, "-m", "repo_fortune", ".", flag, " "],
+                               cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(r.returncode, 2, flag)
+            self.assertIn(f"{flag} is empty", r.stderr)
+
     def test_json_and_markdown_together_is_a_usage_error(self):
         r = subprocess.run([sys.executable, "-m", "repo_fortune", ".", "--json", "--markdown"],
                            cwd=ROOT, capture_output=True, text=True)

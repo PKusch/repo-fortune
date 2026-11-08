@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- An empty `--author`, `--since` or `--until` is refused; it used to read every commit as if no filter had been given.
 - `--list --json` prints the fortunes as JSON; `--json` was ignored there.
 - `--json` and `--markdown` together is refused; `--json` used to win without a word.
 - The box keeps a straight right edge when the favourite word is Chinese, Japanese or Korean, whose characters take two columns.
