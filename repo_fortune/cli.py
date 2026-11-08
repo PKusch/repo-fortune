@@ -14,10 +14,12 @@ def main(argv=None):
     p.add_argument("--author", help="only read commits whose author matches this name or email")
     p.add_argument("--since", help="only read commits after this date, e.g. 2026-01-01 or '3 months ago'")
     p.add_argument("--until", help="only read commits up to this date, e.g. 2026-06-30; with --since this reads one window of history")
-    p.add_argument("--markdown", action="store_true",
-                   help="print the fortune as a Markdown block to paste into a README or issue")
-    p.add_argument("--json", action="store_true",
-                   help="print the fortune and its numbers as JSON")
+    # one output format at a time: --json used to win over --markdown silently
+    fmt = p.add_mutually_exclusive_group()
+    fmt.add_argument("--markdown", action="store_true",
+                     help="print the fortune as a Markdown block to paste into a README or issue")
+    fmt.add_argument("--json", action="store_true",
+                     help="print the fortune and its numbers as JSON")
     p.add_argument("--list", action="store_true", dest="list_fortunes",
                    help="print every fortune there is and exit")
     args = p.parse_args(argv)

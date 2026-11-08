@@ -406,6 +406,12 @@ class RealRepo(unittest.TestCase):
         log = open(os.path.join(ROOT, "CHANGELOG.md"), encoding="utf-8").read()
         self.assertIn(f"## {__version__}", log)
 
+    def test_json_and_markdown_together_is_a_usage_error(self):
+        r = subprocess.run([sys.executable, "-m", "repo_fortune", ".", "--json", "--markdown"],
+                           cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("not allowed with argument", r.stderr)
+
     def test_list_prints_every_fortune_without_reading_a_repo(self):
         from repo_fortune.cli import main
         import contextlib, io

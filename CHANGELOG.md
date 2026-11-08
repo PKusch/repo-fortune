@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- `--json` and `--markdown` together is refused; `--json` used to win without a word.
 - The box keeps a straight right edge when the favourite word is Chinese, Japanese or Korean, whose characters take two columns.
 - When `--author`, `--since` or `--until` leave out every commit, it says so instead of reading the repo as The Blank Page.
 - An impossible date such as `--since 2026-02-30` is refused in one line instead of being read as some other day.
