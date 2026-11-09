@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 - An empty `--author`, `--since` or `--until` is refused; it used to read every commit as if no filter had been given.
 - `--list --json` prints the fortunes as JSON; `--json` was ignored there.
 - `--json` and `--markdown` together is refused; `--json` used to win without a word.
